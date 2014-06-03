@@ -27,12 +27,19 @@ class ESSPlayer():
 			config.SERVER, config.NAME))
 		req.add_header('Accept', 'application/json')
 		u = urllib2.urlopen(req)
-		song = json.loads(u.read())
+		data = json.loads(u.read())
 		u.close()
-		return song.get('id')
+		current = data.get('current')
+		if not current:
+			return None
+		return current.get('media')
 
 	def play(self, sid):
-		os.system('mplayer %s/song/%s' % (config.SERVER, sid))
+		os.system('mplayer %s/media/%s' % (config.SERVER, sid))
+		req = urllib2.Request('%s/playlist/%s/current/done' % (
+			config.SERVER, config.NAME))
+		req.add_header('Accept', 'application/json')
+		urllib2.urlopen(req)
 
 
 	def run(self):
